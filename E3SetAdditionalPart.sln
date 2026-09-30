@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E3SetAdditionalPart", "E3SetAdditionalPart.csproj", "{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{83E511E3-D013-495A-9097-08A25BE6B39A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Debug|x86.Build.0 = Debug|Any CPU
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Release|x86.ActiveCfg = Release|Any CPU
+		{EEFF05CB-07DB-4D84-A909-205FE0CACBF6}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F3C779D7-BD98-4FD2-BBED-21BD486E8515}
+	EndGlobalSection
+EndGlobal
