@@ -29,7 +29,9 @@ namespace E3SetAdditionalPart
         private e3Job job = null;
         private e3Tree tree = null;
         private e3Device dev = null;
-        private int shtampDevId = 0; // запоминаем, чтобы при повторном подключении к Е3 восстановить устройство для которого у нас накоплены данные
+        private e3Pin wire = null;
+        private int shtampObjectId = 0; // запоминаем, чтобы при повторном подключении к Е3 восстановить устройство(провод) для которого у нас накоплены данные
+        private Boolean isShtampDevice = false;
         private e3Attribute attribute;
 
 
@@ -96,8 +98,10 @@ namespace E3SetAdditionalPart
 
                 InitializeComponent();
 
-                tbNameDevice.Text = dev.GetName();
-                shtampDevId = dev.GetId();
+                if( dev != null)
+                    tbNameDevice.Text = dev.GetName();
+                else
+                    tbNameDevice.Text = wire.GetName();
 
                 // Скрываем колонку "Кол-во" для таблицы замен
                 replacementPartsUserControl.ShowAmountColumn = false;
@@ -150,11 +154,25 @@ namespace E3SetAdditionalPart
 
         private void readAdditionalParts()
         {
-            String numberAdditionalPart;
+            string numberAdditionalPart;
+            string selectedName = "";
             double amountAddPart = 1.0;
+            int nAllValues = 0;
 
             dynamic attributeIds = null;
-            int nAllValues = dev.GetAttributeIds(ref attributeIds, "AdditionalPart");
+
+            if (dev != null)
+            {
+                selectedName = dev.GetName();
+                nAllValues = dev.GetAttributeIds(ref attributeIds, "AdditionalPart");
+            }
+            else {
+                selectedName = wire.GetName();
+                nAllValues = wire.GetAttributeIds(ref attributeIds, "AdditionalPart");
+            }
+
+
+
             for (int i = 1; i <= nAllValues; i++) // считываем по очереди все значения многозначного атрибута "AdditionalPart"
             {
                 attribute.SetId(attributeIds[i]);
@@ -169,8 +187,8 @@ namespace E3SetAdditionalPart
                 }
                 catch (Exception ex)
                 {
-                    if (!errorMessages.Contains(dev.GetName() + " дополнительная часть " + ex.Message))
-                        errorMessages.Add(dev.GetName() + " дополнительная часть " + ex.Message);
+                    if (!errorMessages.Contains(selectedName + " дополнительная часть " + ex.Message))
+                        errorMessages.Add(selectedName + " дополнительная часть " + ex.Message);
                     continue;
                 }
 
@@ -200,7 +218,18 @@ namespace E3SetAdditionalPart
         {
             String numberReplacementPart;
             dynamic attributeIds = null;
-            int nAllValues = dev.GetAttributeIds(ref attributeIds, "AdditionalReplacement");
+            int nAllValues = 0;
+
+            if(dev != null)
+            {
+                nAllValues = dev.GetAttributeIds(ref attributeIds, "AdditionalReplacement");
+            }
+            else
+            {
+                nAllValues = wire.GetAttributeIds(ref attributeIds, "AdditionalReplacement");
+            }
+            
+            
             for (int i = 1; i <= nAllValues; i++) // считываем по очереди все значения многозначного атрибута "ReplacementPart"
             {
                 attribute.SetId(attributeIds[i]);
@@ -321,31 +350,22 @@ namespace E3SetAdditionalPart
         /// <param name="e"></param>
         private void buttonOk_Click(object sender, EventArgs e)
         {
-            InitialiseE3Objects();
-            dev.SetId( shtampDevId); // восстановили изделие. За время работы в утилите могли выбрать другое !
-
-            saveData(dev);
+            restoreObjectAndSave();
 
             DisconnectFromE3Series();
             System.Environment.Exit(0);
         }
 
-
         private void buttonSynchr_Click(object sender, EventArgs e)
         {
-            InitialiseE3Objects(); // dev - тут уже получили новое выделенное устройство
-            int newDevId = dev.GetId();
+            restoreObjectAndSave();
 
+            InitialiseE3Objects(); //TODO.    получаем новый объект для работы
 
-            // сначала нужно сохранить возможные внесенные изменения в устройство которое редактировалось до нажатия кнопки Синхронизации
-            dev.SetId( shtampDevId); // восстановили устройство
-            saveData( dev);
-
-
-            // переключаемся на новое устройство для работы дальше в утилите уже с ним
-            dev.SetId(newDevId);
-            tbNameDevice.Text = dev.GetName();
-            shtampDevId = dev.GetId();
+            if (dev != null)
+                tbNameDevice.Text = dev.GetName();
+            else
+                tbNameDevice.Text = wire.GetName();
 
             // Загружаем из многозначных атрибутов изделия Е3 его Дополнительные части и Замены и синхронизируем каждую из них с Windchill
             additionalParts = new List<AdditionalPart>();
@@ -371,7 +391,32 @@ namespace E3SetAdditionalPart
 
         }
 
-        private void saveData(e3Device dev)
+
+        private void restoreObjectAndSave()
+        {
+            int beforeShtampObjectId = shtampObjectId;
+            Boolean isBeforeShtampDevice = isShtampDevice;
+
+            InitialiseE3Objects(); // тут уже могли получить новое значение для shtampObjectId и isShtampDevice
+
+            // Восстанавливаем объект который был до дисконнекта от Е3.
+            if (isBeforeShtampDevice == true)
+            {
+                dev = job.CreateDeviceObject();
+                dev.SetId(beforeShtampObjectId);
+                wire = null;
+            }
+            else
+            {
+                wire = job.CreatePinObject();
+                wire.SetId(beforeShtampObjectId);
+                dev = null;
+            }
+
+            saveData();
+        }
+
+        private void saveData()
         {
             // Синхронизируем количество из грида дополнительных частей
             //additionalPartsUserControl.SyncAmountFromGrid();
@@ -385,28 +430,21 @@ namespace E3SetAdditionalPart
             }
 
 
-            dev.DeleteAttribute("AdditionalPart");
-            updateAttributeData(additionalPartsUserControl.Parts, "AdditionalPart");
+            if (dev != null)
+            {
+                dev.DeleteAttribute("AdditionalPart");
+                dev.DeleteAttribute("AdditionalReplacement");
+            }
+            else
+            {
+                wire.DeleteAttribute("AdditionalPart");
+                wire.DeleteAttribute("AdditionalReplacement");
+            }
 
-            dev.DeleteAttribute("AdditionalReplacement");
+            updateAttributeData(additionalPartsUserControl.Parts, "AdditionalPart");
             updateAttributeData(replacementPartsUserControl.Parts, "AdditionalReplacement");
         }
 
-
-        /* private void updateAttributeData(List<AdditionalPart> parts, string attributeName)
-         {
-             foreach (AdditionalPart part in parts)
-             {
-                 if( dev.HasAttribute(attributeName) == 0) // у dev еще нет атрибута 
-                 {
-                     dev.SetAttributeValue(attributeName, part.number);
-                 }
-                 else
-                 {
-                     dev.AddAttibuteValue(attributeName, part.number);
-                 }
-             }
-         } */
 
         private void updateAttributeData(List<AdditionalPart> parts, string attributeName)
         {
@@ -429,14 +467,28 @@ namespace E3SetAdditionalPart
                 }
 
 
-
-                if (dev.HasAttribute(attributeName) == 0)
+                if (dev != null)
                 {
-                    dev.SetAttributeValue(attributeName, valueToWrite);
+                    // так в Е3 работаем с многозначным атрибутом
+                    if (dev.HasAttribute(attributeName) == 0)
+                    {
+                        dev.SetAttributeValue(attributeName, valueToWrite);
+                    }
+                    else
+                    {
+                        dev.AddAttributeValue(attributeName, valueToWrite);
+                    }
                 }
                 else
                 {
-                    dev.AddAttibuteValue(attributeName, valueToWrite);
+                    if (wire.HasAttribute(attributeName) == 0)
+                    {
+                        wire.SetAttributeValue(attributeName, valueToWrite);
+                    }
+                    else
+                    {
+                        wire.AddAttributeValue(attributeName, valueToWrite);
+                    }
                 }
             }
         }
@@ -549,7 +601,7 @@ namespace E3SetAdditionalPart
         {
             app = ConnectToE3();
             job = CreateJobObject();
-            dev = CheckAndGetSelectedDevice();
+            CheckAndGetSelectedDeviceOrWire();
             attribute = job.CreateAttributeObject();
         }
 
@@ -638,14 +690,22 @@ namespace E3SetAdditionalPart
             return ret;
         }
 
-        private e3Device CheckAndGetSelectedDevice()
+        private void CheckAndGetSelectedDeviceOrWire()
         {
             tree = job.CreateTreeObject();
             tree.SetId(job.GetActiveTreeID());
-            dev = job.CreateDeviceObject();
+            dev = job.CreateDeviceObject(); // Изделие, кабель
+            wire = job.CreatePinObject(); // жила(провод)
 
+
+            int nSelDev = 0;
             dynamic sSelDevIds = null;
-            int nSelDev = tree.GetSelectedAllDeviceIds(ref sSelDevIds);
+            nSelDev = tree.GetSelectedPinIds(ref sSelDevIds);
+            if (nSelDev == 0)
+            {
+                nSelDev = tree.GetSelectedAllDeviceIds(ref sSelDevIds);
+            }            
+            
 
             if (nSelDev == 0)
             {
@@ -665,16 +725,40 @@ namespace E3SetAdditionalPart
                 System.Environment.Exit(0);
             }
 
-            int deviceId = dev.SetId(sSelDevIds[1]);
-            // если выделили не изделие, а его изображение
-            int originalId = dev.GetOriginalId();
-            if (originalId > 0)
-            {
-                // Перестановка c изображения изделия на оригинал
-                deviceId = dev.SetId(originalId);
-            }
+            int selectedId = sSelDevIds[1];
 
-            return dev;
+            if (job.GetItemType(selectedId) != 22) // 22 это Wire or Core
+            {
+                wire = null;
+
+                int deviceId = dev.SetId(selectedId);
+                // если выделили не изделие, а его изображение
+                int originalId = dev.GetOriginalId();
+                if (originalId > 0)
+                {
+                    // Перестановка c изображения изделия на оригинал
+                    dev.SetId(originalId);
+                }
+
+                shtampObjectId = dev.GetId();
+                isShtampDevice = true;
+            }
+            else
+            {
+                dev = null;
+
+                int wireId = wire.SetId(selectedId);
+                // если выделили не изделие, а его изображение
+                int originalId = wire.GetOriginalId();
+                if (originalId > 0)
+                {
+                    // Перестановка c изображения изделия на оригинал
+                    wire.SetId(originalId);
+                }
+
+                shtampObjectId = wire.GetId();
+                isShtampDevice = false;
+            }
         }
 
         // Отключение от E3.Series и освобождение всех полей, связанных
@@ -694,6 +778,7 @@ namespace E3SetAdditionalPart
             job = null;
             tree = null;
             dev = null;
+            wire = null;
             attribute = null;
 
             // принудительно удаляем пустые (null) ссылки

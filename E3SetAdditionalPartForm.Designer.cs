@@ -34,13 +34,13 @@ namespace E3SetAdditionalPart
             this.panel2 = new System.Windows.Forms.Panel();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.tbNameDevice = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.buttonSynchr = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPageAdditionalParts = new System.Windows.Forms.TabPage();
-            this.tabPageReplacementParts = new System.Windows.Forms.TabPage();
-            this.buttonSynchr = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.tbNameDevice = new System.Windows.Forms.TextBox();
             this.additionalPartsUserControl = new E3SetAdditionalPart.PartsUserControl();
+            this.tabPageReplacementParts = new System.Windows.Forms.TabPage();
             this.replacementPartsUserControl = new E3SetAdditionalPart.PartsUserControl();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -97,6 +97,32 @@ namespace E3SetAdditionalPart
             this.panel1.Size = new System.Drawing.Size(1141, 54);
             this.panel1.TabIndex = 1;
             // 
+            // tbNameDevice
+            // 
+            this.tbNameDevice.Location = new System.Drawing.Point(336, 17);
+            this.tbNameDevice.Name = "tbNameDevice";
+            this.tbNameDevice.ReadOnly = true;
+            this.tbNameDevice.Size = new System.Drawing.Size(500, 20);
+            this.tbNameDevice.TabIndex = 2;
+            // 
+            // label1
+            // 
+            this.label1.Location = new System.Drawing.Point(226, 17);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(110, 20);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Изделие в проекте";
+            // 
+            // buttonSynchr
+            // 
+            this.buttonSynchr.Location = new System.Drawing.Point(53, 13);
+            this.buttonSynchr.Name = "buttonSynchr";
+            this.buttonSynchr.Size = new System.Drawing.Size(99, 30);
+            this.buttonSynchr.TabIndex = 0;
+            this.buttonSynchr.Text = "Синхронизация";
+            this.buttonSynchr.UseVisualStyleBackColor = true;
+            this.buttonSynchr.Click += new System.EventHandler(this.buttonSynchr_Click);
+            // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPageAdditionalParts);
@@ -114,10 +140,20 @@ namespace E3SetAdditionalPart
             this.tabPageAdditionalParts.Location = new System.Drawing.Point(4, 22);
             this.tabPageAdditionalParts.Name = "tabPageAdditionalParts";
             this.tabPageAdditionalParts.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageAdditionalParts.Size = new System.Drawing.Size(985, 426);
+            this.tabPageAdditionalParts.Size = new System.Drawing.Size(1133, 426);
             this.tabPageAdditionalParts.TabIndex = 0;
             this.tabPageAdditionalParts.Text = "Дополнительные части";
             this.tabPageAdditionalParts.UseVisualStyleBackColor = true;
+            // 
+            // additionalPartsUserControl
+            // 
+            this.additionalPartsUserControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.additionalPartsUserControl.Location = new System.Drawing.Point(3, 3);
+            this.additionalPartsUserControl.Name = "additionalPartsUserControl";
+            this.additionalPartsUserControl.ShowAmountColumn = true;
+            this.additionalPartsUserControl.ShowPrimColumn = true;
+            this.additionalPartsUserControl.Size = new System.Drawing.Size(1127, 420);
+            this.additionalPartsUserControl.TabIndex = 0;
             // 
             // tabPageReplacementParts
             // 
@@ -130,48 +166,13 @@ namespace E3SetAdditionalPart
             this.tabPageReplacementParts.Text = "Допустимые замены";
             this.tabPageReplacementParts.UseVisualStyleBackColor = true;
             // 
-            // buttonSynchr
-            // 
-            this.buttonSynchr.Location = new System.Drawing.Point(53, 13);
-            this.buttonSynchr.Name = "buttonSynchr";
-            this.buttonSynchr.Size = new System.Drawing.Size(99, 30);
-            this.buttonSynchr.TabIndex = 0;
-            this.buttonSynchr.Text = "Синхронизация";
-            this.buttonSynchr.UseVisualStyleBackColor = true;
-            this.buttonSynchr.Click += new System.EventHandler(this.buttonSynchr_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(263, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(67, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Устройство";
-            // 
-            // tbNameDevice
-            // 
-            this.tbNameDevice.Location = new System.Drawing.Point(336, 17);
-            this.tbNameDevice.Name = "tbNameDevice";
-            this.tbNameDevice.ReadOnly = true;
-            this.tbNameDevice.Size = new System.Drawing.Size(500, 20);
-            this.tbNameDevice.TabIndex = 2;
-            // 
-            // additionalPartsUserControl
-            // 
-            this.additionalPartsUserControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.additionalPartsUserControl.Location = new System.Drawing.Point(3, 3);
-            this.additionalPartsUserControl.Name = "additionalPartsUserControl";
-            this.additionalPartsUserControl.ShowAmountColumn = true;
-            this.additionalPartsUserControl.Size = new System.Drawing.Size(979, 420);
-            this.additionalPartsUserControl.TabIndex = 0;
-            // 
             // replacementPartsUserControl
             // 
             this.replacementPartsUserControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.replacementPartsUserControl.Location = new System.Drawing.Point(3, 3);
             this.replacementPartsUserControl.Name = "replacementPartsUserControl";
             this.replacementPartsUserControl.ShowAmountColumn = true;
+            this.replacementPartsUserControl.ShowPrimColumn = true;
             this.replacementPartsUserControl.Size = new System.Drawing.Size(1127, 420);
             this.replacementPartsUserControl.TabIndex = 0;
             // 
@@ -185,7 +186,7 @@ namespace E3SetAdditionalPart
             this.Controls.Add(this.panel2);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "E3SetAdditionalPartForm";
-            this.Text = "Перечень дополнительных Частей и Замен";
+            this.Text = "Перечень дополнительных Частей и Замен (от 27.10.2026)";
             this.panel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
