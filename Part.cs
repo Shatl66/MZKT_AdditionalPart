@@ -26,6 +26,7 @@ namespace E3WGM
             set { _oid = value; }
         }
 
+        /*
         [DataMember]
         private bool _wchcheckout = true;
         public bool wchcheckout
@@ -33,8 +34,7 @@ namespace E3WGM
             get { return _wchcheckout; }
             set { _wchcheckout = value; }
         }
-
-        /*
+        
         [DataMember]
         private string _barcode = "";
         public string ATR_BARCODE
