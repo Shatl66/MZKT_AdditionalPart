@@ -186,7 +186,7 @@ namespace E3SetAdditionalPart
             this.Controls.Add(this.panel2);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "E3SetAdditionalPartForm";
-            this.Text = "Перечень дополнительных Частей и Замен (от 27.10.2026)";
+            this.Text = "Перечень дополнительных Частей и Замен (от 11.11.2026)";
             this.panel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
